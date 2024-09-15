@@ -64,6 +64,8 @@ export const login = async (req, res) => {
             })
         }
         const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+
         if (!isPasswordMatch) {
             return res.status(400).json({
                 message: "Incorrect email or password.",
@@ -92,15 +94,25 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpsOnly: true, sameSite: 'strict' }).json({
+        return res.status(200)
+        .cookie("token", token, { 
+            maxAge: 1 * 24 * 60 * 60 * 1000, 
+            httpOnly: true, // Corrected
+            secure: process.env.NODE_ENV === 'production', // Ensures it's only sent over HTTPS in production
+            sameSite: 'strict' 
+        })
+        .json({
             message: `Welcome back ${user.fullname}`,
             user,
             success: true
-        })
+        });
+    
     } catch (error) {
         console.log(error);
     }
 }
+
+
 export const logout = async (req, res) => {
     try {
         return res.status(200).cookie("token", "", { maxAge: 0 }).json({
