@@ -41,11 +41,14 @@ const PostJob = () => {
     const submitHandler = async (e) => {
         e.preventDefault();
         try {
+            const token = localStorage.getItem('token'); 
             setLoading(true);
             const res = await axios.post(`${JOB_API_END_POINT}/post`, input,{
                 headers:{
-                    'Content-Type':'application/json'
+                    'Content-Type':'application/json' ,
+                    'Authorization': `Bearer ${token}` ,
                 },
+                
                 withCredentials:true
             });
             if(res.data.success){
